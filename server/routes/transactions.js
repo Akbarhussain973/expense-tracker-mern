@@ -1,15 +1,15 @@
 const router = require("express").Router();
 const protect = require("../middleware/protect");
-const Expense = require("../models/Expense");
+const Transaction = require("../models/Transaction");
 const Category = require("../models/Category");
 
 router.use(protect);
 
 router.get("/", async (req, res) => {
-  const expenses = await Expense.find({ user: req.userId }).populate(
+  const transactions = await Transaction.find({ user: req.userId }).populate(
     "category",
   );
-  res.json(expenses);
+  res.json(transactions);
 });
 
 router.post("/", async (req, res) => {
@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Invalid category" });
     }
 
-    const expense = await Expense.create({
+    const transaction = await Transaction.create({
       user: req.userId,
       category,
       amount,
@@ -32,28 +32,30 @@ router.post("/", async (req, res) => {
       description,
       date,
     });
-    res.status(201).json(expense);
+    res.status(201).json(transaction);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
 
 router.put("/:id", async (req, res) => {
-  const expense = await Expense.findOneAndUpdate(
+  const transaction = await Transaction.findOneAndUpdate(
     { _id: req.params.id, user: req.userId },
     req.body,
     { new: true },
   );
-  if (!expense) return res.status(404).json({ message: "Expense not found" });
-  res.json(expense);
+  if (!transaction)
+    return res.status(404).json({ message: "Transaction not found" });
+  res.json(transaction);
 });
 
 router.delete("/:id", async (req, res) => {
-  const expense = await Expense.findOneAndDelete({
+  const transaction = await Transaction.findOneAndDelete({
     _id: req.params.id,
     user: req.userId,
   });
-  if (!expense) return res.status(404).json({ message: "Expense not found" });
+  if (!transaction)
+    return res.status(404).json({ message: "Transaction not found" });
   res.json({ message: "Deleted" });
 });
 
