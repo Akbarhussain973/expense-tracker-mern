@@ -5,6 +5,8 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const authRoutes = require("./routes/auth");
+const protect = require("./middleware/protect");
 
 app.use(
   cors({
@@ -15,7 +17,9 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.use("/", authRoutes);
+
+app.get("/", protect, (req, res) => {
   res.json({ status: "ok" });
 });
 
