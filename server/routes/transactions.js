@@ -2,6 +2,8 @@ const router = require("express").Router();
 const protect = require("../middleware/protect");
 const Transaction = require("../models/Transaction");
 const Category = require("../models/Category");
+const validate = require("../middleware/validate");
+const { transactionSchema } = require("../schemas/transactionSchemas");
 
 router.use(protect);
 
@@ -12,7 +14,7 @@ router.get("/", async (req, res) => {
   res.json(transactions);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", validate(transactionSchema), async (req, res) => {
   try {
     const { category, amount, type, description, date } = req.body;
 
@@ -38,7 +40,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", validate(transactionSchema), async (req, res) => {
   const transaction = await Transaction.findOneAndUpdate(
     { _id: req.params.id, user: req.userId },
     req.body,

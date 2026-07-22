@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 function Dashboard() {
@@ -8,6 +9,7 @@ function Dashboard() {
   const [form, setForm] = useState({ category: "", amount: "", type: "expense", description: "" });
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const navigate = useNavigate();
 
   const loadData = () => {
     Promise.all([
@@ -28,6 +30,14 @@ function Dashboard() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleLogout = async () => {
+  await fetch("http://localhost:3000/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  navigate("/login");
+};
+
 const handleEdit = (exp) => {
     setEditingId(exp._id);
     setForm({
@@ -36,6 +46,25 @@ const handleEdit = (exp) => {
     type: exp.type,
     description: exp.description,
     });
+};
+
+const [categoryName, setCategoryName] = useState("");
+
+const handleAddCategory = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await fetch("http://localhost:3000/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name: categoryName }),
+    });
+    if (!res.ok) throw new Error("Failed to add category");
+    setCategoryName("");
+    loadData();
+  } catch (err) {
+    setError("Failed to add category +", err);
+  }
 };
 
   const handleSubmit = async (e) => {
@@ -88,7 +117,17 @@ const handleEdit = (exp) => {
   return (
     <div>
       <h2>Dashboard</h2>
-
+      <button onClick={handleLogout}>Logout</button>
+      <h3>Add Category</h3>
+    <form onSubmit={handleAddCategory}>
+      <input
+        placeholder="New category"
+        value={categoryName}
+        onChange={(e) => setCategoryName(e.target.value)}
+        required
+      />
+      <button type="submit">Add Category</button>
+    </form>
       <h3>Add Expense</h3>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
