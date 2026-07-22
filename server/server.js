@@ -7,6 +7,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/auth");
 const protect = require("./middleware/protect");
+const categoryRoutes = require("./routes/categories");
+const expenseRoutes = require("./routes/expenses");
 
 app.use(
   cors({
@@ -18,6 +20,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/", authRoutes);
+app.use("/categories", categoryRoutes);
+app.use("/expenses", expenseRoutes);
 
 app.get("/", protect, (req, res) => {
   res.json({ status: "ok" });
