@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth");
 const protect = require("./middleware/protect");
 const categoryRoutes = require("./routes/categories");
 const transactionRoutes = require("./routes/transactions");
+const dashboardRoutes = require("./routes/dashboard");
 const helmet = require("helmet");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use("/", authRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/transactions", transactionRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 app.get("/", protect, (req, res) => {
   res.json({ status: "ok" });

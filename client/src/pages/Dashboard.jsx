@@ -9,18 +9,41 @@ function Dashboard() {
   const [form, setForm] = useState({ category: "", amount: "", type: "expense", description: "" });
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [categoryName, setCategoryName] = useState("");
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [stats, setStats] = useState({
+    income: 0,
+    expense: 0,
+    balance: 0,
+  });
+
   const navigate = useNavigate();
 
   const loadData = () => {
-    Promise.all([
-      fetch("http://localhost:3000/categories", { credentials: "include" }).then((res) => res.json()),
-      fetch("http://localhost:3000/transactions", { credentials: "include" }).then((res) => res.json()),
-    ]).then(([categoriesData, expensesData]) => {
+  Promise.all([
+    fetch("http://localhost:3000/categories", {
+      credentials: "include",
+    }).then((res) => res.json()),
+
+    fetch("http://localhost:3000/transactions", {
+      credentials: "include",
+    }).then((res) => res.json()),
+
+    fetch("http://localhost:3000/dashboard/stats", {
+      credentials: "include",
+    }).then((res) => res.json()),
+  ])
+    .then(([categoriesData, expensesData, statsData]) => {
       setCategories(categoriesData);
       setExpenses(expensesData);
+      setStats(statsData);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error(err);
       setLoading(false);
     });
-  };
+};
 
   useEffect(() => {
     loadData();
@@ -48,24 +71,40 @@ const handleEdit = (exp) => {
     });
 };
 
-const [categoryName, setCategoryName] = useState("");
 
-const handleAddCategory = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch("http://localhost:3000/categories", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ name: categoryName }),
-    });
-    if (!res.ok) throw new Error("Failed to add category");
-    setCategoryName("");
-    loadData();
-  } catch (err) {
-    setError("Failed to add category +", err);
-  }
-};
+
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+
+    const url = editingCategoryId
+      ? `http://localhost:3000/categories/${editingCategoryId}`
+      : "http://localhost:3000/categories";
+
+    const method = editingCategoryId ? "PUT" : "POST";
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: categoryName,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to save category");
+      }
+
+      setCategoryName("");
+      setEditingCategoryId(null);
+      loadData();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,6 +139,11 @@ const handleAddCategory = async (e) => {
     }
   };
 
+  const handleEditCategory = (category) => {
+    setEditingCategoryId(category._id);
+    setCategoryName(category.name);
+  };
+
   const handleDelete = async (id) => {
   try {
     await fetch(`http://localhost:3000/transactions/${id}`, {
@@ -112,23 +156,82 @@ const handleAddCategory = async (e) => {
   }
 };
 
-  if (loading) return <p>Loading...</p>;
+const handleDeleteCategory = async (id) => {
+  try {
+    const res = await fetch(`http://localhost:3000/categories/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
+    if (!res.ok) {
+      throw new Error("Failed to delete category");
+    }
+
+
+    if (editingCategoryId === id) {
+      setEditingCategoryId(null);
+      setCategoryName("");
+    }
+
+    loadData();
+  } catch (err) {
+    setError(err.message);
+  }
+};
+
+  if (loading) return <p>Loading...</p>;
   return (
     <div>
       <h2>Dashboard</h2>
       <button onClick={handleLogout}>Logout</button>
-      <h3>Add Category</h3>
+      <h3>Overview</h3>
+
+    <p>Balance: ${stats.balance}</p>
+    <p>Income: ${stats.income}</p>
+    <p>Expense: ${stats.expense}</p>
+
+    <h3>Add Category</h3>
+    <h3>Categories</h3>
+
+    <ul>
+      {categories.map((cat) => (
+        <li key={cat._id}>
+          {cat.name}
+
+        <button onClick={() => handleEditCategory(cat)}>
+          Edit
+        </button>
+        <button onClick={() => handleDeleteCategory(cat._id)}>
+        Delete
+        </button>
+        </li>
+      ))}
+    </ul>
     <form onSubmit={handleAddCategory}>
-      <input
-        placeholder="New category"
-        value={categoryName}
-        onChange={(e) => setCategoryName(e.target.value)}
-        required
-      />
-      <button type="submit">Add Category</button>
+    <input
+      placeholder="New category"
+      value={categoryName}
+      onChange={(e) => setCategoryName(e.target.value)}
+      required
+    />
+
+    <button type="submit">
+      {editingCategoryId ? "Update Category" : "Add Category"}
+    </button>
+
+    {editingCategoryId && (
+      <button
+        type="button"
+        onClick={() => {
+          setEditingCategoryId(null);
+          setCategoryName("");
+        }}
+      >
+        Cancel
+      </button>
+    )}
     </form>
-      <h3>Add Expense</h3>
+      <h3>Add Transaction</h3>
       {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <select name="category" value={form.category} onChange={handleChange} required>
@@ -151,7 +254,7 @@ const handleAddCategory = async (e) => {
 )}
       </form>
 
-      <h3>Expenses</h3>
+      <h3>Transactions</h3>
       <ul>
         {expenses.map((exp) => (
           <li key={exp._id}>

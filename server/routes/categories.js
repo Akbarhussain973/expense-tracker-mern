@@ -25,6 +25,33 @@ router.post(
   }),
 );
 
+router.put(
+  "/:id",
+  asyncWrapper(async (req, res) => {
+    const category = await Category.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        user: req.userId,
+      },
+      {
+        name: req.body.name,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    if (!category) {
+      return res.status(404).json({
+        message: "Category not found",
+      });
+    }
+
+    res.json(category);
+  }),
+);
+
 router.delete(
   "/:id",
   asyncWrapper(async (req, res) => {
