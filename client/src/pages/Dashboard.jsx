@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 function Dashboard() {
@@ -21,15 +22,15 @@ function Dashboard() {
 
   const loadData = () => {
   Promise.all([
-    fetch("http://localhost:3000/categories", {
+    fetch(`${API_URL}/categories`, {
       credentials: "include",
     }).then((res) => res.json()),
 
-    fetch("http://localhost:3000/transactions", {
+    fetch(`${API_URL}/transactions`, {
       credentials: "include",
     }).then((res) => res.json()),
 
-    fetch("http://localhost:3000/dashboard/stats", {
+    fetch(`${API_URL}/dashboard/stats`, {
       credentials: "include",
     }).then((res) => res.json()),
   ])
@@ -54,7 +55,7 @@ function Dashboard() {
   };
 
   const handleLogout = async () => {
-  await fetch("http://localhost:3000/logout", {
+  await fetch(`${API_URL}/logout`, {
     method: "POST",
     credentials: "include",
   });
@@ -77,8 +78,8 @@ const handleEdit = (exp) => {
     e.preventDefault();
 
     const url = editingCategoryId
-      ? `http://localhost:3000/categories/${editingCategoryId}`
-      : "http://localhost:3000/categories";
+      ? `${API_URL}/categories/${editingCategoryId}`
+      : `${API_URL}/categories`;
 
     const method = editingCategoryId ? "PUT" : "POST";
 
@@ -111,8 +112,8 @@ const handleEdit = (exp) => {
     setError("");
 
     const url = editingId
-    ? `http://localhost:3000/transactions/${editingId}`
-    : "http://localhost:3000/transactions";
+    ? `${API_URL}/transactions/${editingId}`
+    : `${API_URL}/transactions`;
 
     const method = editingId ? "PUT" : "POST";
 
@@ -145,8 +146,11 @@ const handleEdit = (exp) => {
   };
 
   const handleDelete = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this transaction?")) {
+  return;
+  }
   try {
-    await fetch(`http://localhost:3000/transactions/${id}`, {
+    await fetch(`${API_URL}/transactions/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -157,8 +161,11 @@ const handleEdit = (exp) => {
 };
 
 const handleDeleteCategory = async (id) => {
+  if (!window.confirm("Delete this category?")) {
+  return;
+  }
   try {
-    const res = await fetch(`http://localhost:3000/categories/${id}`, {
+    const res = await fetch(`${API_URL}/categories/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -179,91 +186,298 @@ const handleDeleteCategory = async (id) => {
   }
 };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
   return (
-    <div>
-      <h2>Dashboard</h2>
-      <button onClick={handleLogout}>Logout</button>
-      <h3>Overview</h3>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-xl font-semibold text-gray-600 animate-pulse">
+        Loading...
+      </div>
+    </div>
+  );
+}
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Expense Tracker
+          </h1>
+          <p className="text-gray-500">
+            Manage your finances
+          </p>
+        </div>
 
-    <p>Balance: ${stats.balance}</p>
-    <p>Income: ${stats.income}</p>
-    <p>Expense: ${stats.expense}</p>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          Logout
+        </button>
+    </div>
+          <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+      Overview
+    </h2>
 
-    <h3>Add Category</h3>
-    <h3>Categories</h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-    <ul>
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <p className="text-gray-500 text-sm">Balance</p>
+        <h3 className="text-3xl font-bold text-blue-600">
+          ${stats.balance}
+        </h3>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <p className="text-gray-500 text-sm">Income</p>
+        <h3 className="text-3xl font-bold text-green-600">
+          ${stats.income}
+        </h3>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <p className="text-gray-500 text-sm">Expense</p>
+        <h3 className="text-3xl font-bold text-red-600">
+          ${stats.expense}
+        </h3>
+      </div>
+
+    </div>
+
+    <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+  <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+    Categories
+  </h2>
+
+  <ul className="space-y-3 mb-6">
+    {categories.map((cat) => (
+      <li
+        key={cat._id}
+        className="flex items-center justify-between border rounded-lg p-3"
+      >
+        <span className="font-medium">{cat.name}</span>
+
+        <div className="space-x-2">
+          <button
+            onClick={() => handleEditCategory(cat)}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={() => handleDeleteCategory(cat._id)}
+            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+          >
+            Delete
+          </button>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+    <form
+      onSubmit={handleAddCategory}
+      className="flex gap-3"
+    >
+      <input
+        placeholder="Category name"
+        value={categoryName}
+        onChange={(e) => setCategoryName(e.target.value)}
+        className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      />
+
+      <button
+        type="submit"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-lg"
+      >
+        {editingCategoryId ? "Update" : "Add"}
+      </button>
+
+      {editingCategoryId && (
+        <button
+          type="button"
+          onClick={() => {
+            setEditingCategoryId(null);
+            setCategoryName("");
+          }}
+          className="bg-gray-400 hover:bg-gray-500 text-white px-5 rounded-lg"
+        >
+          Cancel
+        </button>
+      )}
+    </form>
+  </div>
+      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+  <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+    {editingId ? "Edit Transaction" : "Add Transaction"}
+  </h2>
+
+  {error && (
+    <p className="text-red-500 mb-4">{error}</p>
+  )}
+
+  <form
+    onSubmit={handleSubmit}
+    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+  >
+    <select
+      name="category"
+      value={form.category}
+      onChange={handleChange}
+      className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      required
+    >
+      <option value="">Select category</option>
+
       {categories.map((cat) => (
-        <li key={cat._id}>
+        <option
+          key={cat._id}
+          value={cat._id}
+        >
           {cat.name}
-
-        <button onClick={() => handleEditCategory(cat)}>
-          Edit
-        </button>
-        <button onClick={() => handleDeleteCategory(cat._id)}>
-        Delete
-        </button>
-        </li>
+        </option>
       ))}
-    </ul>
-    <form onSubmit={handleAddCategory}>
+    </select>
+
     <input
-      placeholder="New category"
-      value={categoryName}
-      onChange={(e) => setCategoryName(e.target.value)}
+      type="number"
+      name="amount"
+      placeholder="Amount"
+      value={form.amount}
+      onChange={handleChange}
+      className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       required
     />
 
-    <button type="submit">
-      {editingCategoryId ? "Update Category" : "Add Category"}
-    </button>
+    <select
+      name="type"
+      value={form.type}
+      onChange={handleChange}
+      className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option value="expense">Expense</option>
+      <option value="income">Income</option>
+    </select>
 
-    {editingCategoryId && (
+    <input
+      name="description"
+      placeholder="Description"
+      value={form.description}
+      onChange={handleChange}
+      className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+
+    <div className="md:col-span-2 flex gap-3">
       <button
-        type="button"
-        onClick={() => {
-          setEditingCategoryId(null);
-          setCategoryName("");
-        }}
+        type="submit"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
       >
-        Cancel
+        {editingId ? "Update" : "Add"}
       </button>
-    )}
-    </form>
-      <h3>Add Transaction</h3>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <select name="category" value={form.category} onChange={handleChange} required>
-          <option value="">Select category</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>{cat.name}</option>
-          ))}
-        </select>
-        <input name="amount" type="number" placeholder="Amount" value={form.amount} onChange={handleChange} required />
-        <select name="type" value={form.type} onChange={handleChange}>
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-        <input name="description" placeholder="Description" value={form.description} onChange={handleChange} />
-        <button type="submit">{editingId ? "Update" : "Add"}</button>
-        {editingId && (
-        <button type="button" onClick={() => { setEditingId(null); setForm({ category: "", amount: "", type: "expense", description: "" }); }}>
-        Cancel
-        </button>
-)}
-      </form>
 
-      <h3>Transactions</h3>
-      <ul>
-        {expenses.map((exp) => (
-          <li key={exp._id}>
-            {exp.category?.name || "Uncategorized"} — ${exp.amount} ({exp.type}) — {exp.description}
-             <button onClick={() => handleEdit(exp)}>Edit</button>
-             <button onClick={() => handleDelete(exp._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      {editingId && (
+        <button
+          type="button"
+          onClick={() => {
+            setEditingId(null);
+            setForm({
+              category: "",
+              amount: "",
+              type: "expense",
+              description: "",
+            });
+          }}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg"
+        >
+          Cancel
+        </button>
+      )}
+    </div>
+  </form>
+</div>
+
+      <div className="bg-white rounded-xl shadow-md p-6">
+  <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+    Transactions
+  </h2>
+
+  <div className="overflow-x-auto">
+    <table className="w-full border-collapse">
+      <thead>
+        <tr className="bg-gray-100">
+          <th className="text-left p-3">Category</th>
+          <th className="text-left p-3">Amount</th>
+          <th className="text-left p-3">Type</th>
+          <th className="text-left p-3">Description</th>
+          <th className="text-left p-3">Actions</th>
+        </tr>
+      </thead>
+
+    <tbody>
+      {expenses.length === 0 ? (
+        <tr>
+          <td
+            colSpan="5"
+            className="text-center py-8 text-gray-500"
+          >
+            No transactions yet.
+          </td>
+        </tr>
+      ) : (
+        expenses.map((exp) => (
+          <tr
+            key={exp._id}
+            className="border-b hover:bg-gray-50"
+          >
+            <td className="p-3">
+              {exp.category?.name || "Uncategorized"}
+            </td>
+
+            <td className="p-3 font-semibold">
+              ${exp.amount}
+            </td>
+
+            <td className="p-3">
+              <span
+                className={`px-3 py-1 rounded-full text-sm text-white ${
+                  exp.type === "income"
+                    ? "bg-green-500"
+                    : "bg-red-500"
+                }`}
+              >
+                {exp.type}
+              </span>
+            </td>
+
+            <td className="p-3">
+              {exp.description}
+            </td>
+
+            <td className="p-3 space-x-2">
+              <button
+                onClick={() => handleEdit(exp)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+              >
+                Edit
+              </button>
+
+              <button
+                onClick={() => handleDelete(exp._id)}
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+    </table>
+  </div>
+</div>
+    </div>
     </div>
   );
 }
