@@ -9,10 +9,14 @@ const authRoutes = require("./routes/auth");
 const protect = require("./middleware/protect");
 const categoryRoutes = require("./routes/categories");
 const transactionRoutes = require("./routes/transactions");
+const helmet = require("helmet");
+const errorHandler = require("./middleware/errorHandler");
+
+app.use(helmet());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   }),
 );
@@ -26,6 +30,8 @@ app.use("/transactions", transactionRoutes);
 app.get("/", protect, (req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
