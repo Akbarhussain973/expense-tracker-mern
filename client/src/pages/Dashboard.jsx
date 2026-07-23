@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  LogOut,
+  Save,
+  Pencil,
+  Trash2,
+  X,
+  Plus,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import ConfirmModal from "../components/ConfirmModal";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -101,9 +112,14 @@ const handleEdit = (exp) => {
 
       setCategoryName("");
       setEditingCategoryId(null);
+      toast.success(
+      editingCategoryId
+        ? "Category updated!"
+        : "Category added!"
+      );
       loadData();
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -128,15 +144,20 @@ const handleEdit = (exp) => {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Failed to add expense");
+        toast.error(data.message || "Failed to save transaction");
         return;
       }
 
       setForm({ category: "", amount: "", type: "expense", description: "" });
       setEditingId(null);
+      toast.success(
+        editingId
+          ? "Transaction updated!"
+          : "Transaction added!"
+      );
       loadData(); // refresh the list
     } catch (err) {
-      setError("Server unreachable, " + err);
+      toast.error("Server unreachable", + err);
     }
   };
 
@@ -154,9 +175,10 @@ const handleEdit = (exp) => {
       method: "DELETE",
       credentials: "include",
     });
+       toast.success("Transaction deleted");
        loadData(); // refresh list after delete
     }  catch (err) {
-    setError("Failed to delete, " + err);
+    toast.error("Failed to delete transaction ", + err);
   }
 };
 
@@ -179,10 +201,10 @@ const handleDeleteCategory = async (id) => {
       setEditingCategoryId(null);
       setCategoryName("");
     }
-
+    toast.success("Category deleted");
     loadData();
   } catch (err) {
-    setError(err.message);
+    toast.error(err.message);
   }
 };
 
@@ -210,9 +232,10 @@ const handleDeleteCategory = async (id) => {
 
         <button
           onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+          className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
         >
-          Logout
+          
+          <LogOut size={18} /> Logout
         </button>
     </div>
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">
@@ -260,15 +283,17 @@ const handleDeleteCategory = async (id) => {
         <div className="space-x-2">
           <button
             onClick={() => handleEditCategory(cat)}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+            className="inline-flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
           >
+            <Pencil size={16} />
             Edit
           </button>
 
           <button
             onClick={() => handleDeleteCategory(cat._id)}
-            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+            className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
           >
+            <Trash2 size={16} />
             Delete
           </button>
         </div>
@@ -290,8 +315,9 @@ const handleDeleteCategory = async (id) => {
 
       <button
         type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-lg"
+        className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 rounded-lg"
       >
+        {editingCategoryId ? <Save size={18} /> : <Plus size={18} />}
         {editingCategoryId ? "Update" : "Add"}
       </button>
 
@@ -302,8 +328,9 @@ const handleDeleteCategory = async (id) => {
             setEditingCategoryId(null);
             setCategoryName("");
           }}
-          className="bg-gray-400 hover:bg-gray-500 text-white px-5 rounded-lg"
+          className="inline-flex items-center justify-center gap-2 bg-gray-400 hover:bg-gray-500 text-white px-5 rounded-lg"
         >
+          <X size={18} />
           Cancel
         </button>
       )}
@@ -372,8 +399,9 @@ const handleDeleteCategory = async (id) => {
     <div className="md:col-span-2 flex gap-3">
       <button
         type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+        className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
       >
+        {editingId ? <Save size={18} /> : <Plus size={18} />}
         {editingId ? "Update" : "Add"}
       </button>
 
@@ -389,8 +417,9 @@ const handleDeleteCategory = async (id) => {
               description: "",
             });
           }}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg"
+          className="inline-flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg"
         >
+          <X size={18} />
           Cancel
         </button>
       )}
@@ -407,11 +436,11 @@ const handleDeleteCategory = async (id) => {
     <table className="w-full border-collapse">
       <thead>
         <tr className="bg-gray-100">
-          <th className="text-left p-3">Category</th>
-          <th className="text-left p-3">Amount</th>
-          <th className="text-left p-3">Type</th>
-          <th className="text-left p-3">Description</th>
-          <th className="text-left p-3">Actions</th>
+          <th className="text-left p-10">Category</th>
+          <th className="text-left p-10">Amount</th>
+          <th className="text-left p-10">Type</th>
+          <th className="text-left p-10">Description</th>
+          <th className="text-left p-10">Actions</th>
         </tr>
       </thead>
 
@@ -458,15 +487,17 @@ const handleDeleteCategory = async (id) => {
             <td className="p-3 space-x-2">
               <button
                 onClick={() => handleEdit(exp)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
+                className="inline-flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
               >
+                <Pencil size={16} />
                 Edit
               </button>
 
               <button
                 onClick={() => handleDelete(exp._id)}
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
               >
+                <Trash2 size={16} />
                 Delete
               </button>
             </td>
