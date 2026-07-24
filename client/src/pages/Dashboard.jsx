@@ -18,7 +18,7 @@ function Dashboard() {
   const [categories, setCategories] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ category: "", amount: "", type: "expense", description: "" });
+  const [form, setForm] = useState({ category: "", amount: "", type: "expense", description: "", date: new Date().toISOString().split("T")[0], });
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [categoryName, setCategoryName] = useState("");
@@ -83,6 +83,7 @@ const handleEdit = (exp) => {
     amount: exp.amount,
     type: exp.type,
     description: exp.description,
+    date: exp.date.split("T")[0],
     });
 };
 
@@ -151,7 +152,13 @@ const handleEdit = (exp) => {
         return;
       }
 
-      setForm({ category: "", amount: "", type: "expense", description: "" });
+      setForm({
+        category: "",
+        amount: "",
+        type: "expense",
+        description: "",
+        date: new Date().toISOString().split("T")[0],
+      });
       setEditingId(null);
       toast.success(
         editingId
@@ -406,6 +413,14 @@ const confirmDelete = async () => {
       className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
 
+    <input
+      type="date"
+      name="date"
+      value={form.date}
+      onChange={handleChange}
+      className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+
     <div className="md:col-span-2 flex gap-3">
       <button
         type="submit"
@@ -425,6 +440,7 @@ const confirmDelete = async () => {
               amount: "",
               type: "expense",
               description: "",
+              date: new Date().toISOString().split("T")[0],
             });
           }}
           className="inline-flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg"
@@ -450,6 +466,7 @@ const confirmDelete = async () => {
           <th className="text-left p-10">Amount</th>
           <th className="text-left p-10">Type</th>
           <th className="text-left p-10">Description</th>
+          <th className="text-left p-10">Date</th>
           <th className="text-left p-10">Actions</th>
         </tr>
       </thead>
@@ -458,7 +475,7 @@ const confirmDelete = async () => {
       {expenses.length === 0 ? (
         <tr>
           <td
-            colSpan="5"
+            colSpan="6"
             className="text-center py-8 text-gray-500"
           >
             No transactions yet.
@@ -492,6 +509,10 @@ const confirmDelete = async () => {
 
             <td className="p-3">
               {exp.description}
+            </td>
+
+            <td className="p-3">
+            {new Date(exp.date).toLocaleDateString()}
             </td>
 
             <td className="p-3 space-x-2">
