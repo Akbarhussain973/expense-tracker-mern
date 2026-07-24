@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut,
@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmModal from "../components/ConfirmModal";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +28,8 @@ function Dashboard() {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteType, setDeleteType] = useState("");
   const [search, setSearch] = useState("");
+  const formRef = useRef(null);
+  const categoryFormRef = useRef(null);
   const [stats, setStats] = useState({
     income: 0,
     expense: 0,
@@ -86,6 +89,10 @@ const handleEdit = (exp) => {
     description: exp.description,
     date: exp.date.split("T")[0],
     });
+    formRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
 };
 
 
@@ -175,6 +182,11 @@ const handleEdit = (exp) => {
   const handleEditCategory = (category) => {
     setEditingCategoryId(category._id);
     setCategoryName(category.name);
+    categoryFormRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+
   };
 
  const handleDelete = (id) => {
@@ -328,6 +340,7 @@ const filteredExpenses = expenses.filter((exp) => {
   </ul>
 
     <form
+      ref={categoryFormRef}
       onSubmit={handleAddCategory}
       className="flex gap-3"
     >
@@ -362,7 +375,7 @@ const filteredExpenses = expenses.filter((exp) => {
       )}
     </form>
   </div>
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+      <div ref={formRef} className="bg-white rounded-xl shadow-md p-6 mb-8">
   <h2 className="text-2xl font-semibold text-gray-700 mb-6">
     {editingId ? "Edit Transaction" : "Add Transaction"}
   </h2>
@@ -532,7 +545,8 @@ const filteredExpenses = expenses.filter((exp) => {
             {new Date(exp.date).toLocaleDateString()}
             </td>
 
-            <td className="p-3 space-x-2">
+            <td className="p-3 whitespace-nowrap">
+              <div className="flex gap-2">
               <button
                 onClick={() => handleEdit(exp)}
                 className="inline-flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded"
@@ -548,6 +562,7 @@ const filteredExpenses = expenses.filter((exp) => {
                 <Trash2 size={16} />
                 Delete
               </button>
+              </div>
             </td>
           </tr>
         ))
