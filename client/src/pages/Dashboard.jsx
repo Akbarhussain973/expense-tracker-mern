@@ -26,6 +26,7 @@ function Dashboard() {
   const [confirmOpen, setConfirmOpen] = useState(false);  
   const [deleteId, setDeleteId] = useState(null);
   const [deleteType, setDeleteType] = useState("");
+  const [search, setSearch] = useState("");
   const [stats, setStats] = useState({
     income: 0,
     expense: 0,
@@ -234,6 +235,14 @@ const confirmDelete = async () => {
     </div>
   );
 }
+const filteredExpenses = expenses.filter((exp) => {
+  const query = search.toLowerCase();
+
+  return (
+    exp.category?.name.toLowerCase().includes(query) ||
+    exp.description?.toLowerCase().includes(query)
+  );
+});
   return (
     <div className="min-h-screen bg-gray-100 p-8">
     <div className="max-w-7xl mx-auto">
@@ -457,7 +466,15 @@ const confirmDelete = async () => {
   <h2 className="text-2xl font-semibold text-gray-700 mb-6">
     Transactions
   </h2>
-
+    <div className="mb-6">
+      <input
+        type="text"
+        placeholder="Search by category or description..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full md:w-96 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
   <div className="overflow-x-auto">
     <table className="w-full border-collapse">
       <thead>
@@ -472,7 +489,7 @@ const confirmDelete = async () => {
       </thead>
 
     <tbody>
-      {expenses.length === 0 ? (
+      {filteredExpenses.length === 0 ? (
         <tr>
           <td
             colSpan="6"
@@ -482,7 +499,7 @@ const confirmDelete = async () => {
           </td>
         </tr>
       ) : (
-        expenses.map((exp) => (
+        filteredExpenses.map((exp) => (
           <tr
             key={exp._id}
             className="border-b hover:bg-gray-50"
