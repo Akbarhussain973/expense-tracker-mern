@@ -7,6 +7,7 @@ function TransactionTable({
   setSortBy,
   filterType,
   setFilterType,
+  setCurrentPage,
   filteredExpenses,
   handleEdit,
   handleDelete,
@@ -22,14 +23,20 @@ function TransactionTable({
       type="text"
       placeholder="Search by category or description..."
       value={search}
-      onChange={(e) => setSearch(e.target.value)}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        setCurrentPage(1);
+      }}
       className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
 
     {/* Filter */}
     <select
       value={filterType}
-      onChange={(e) => setFilterType(e.target.value)}
+      onChange={(e) => {
+        setFilterType(e.target.value);
+        setCurrentPage(1);
+      }}
       className="border rounded-lg px-4 py-2"
     >
       <option value="all">All</option>
@@ -40,7 +47,10 @@ function TransactionTable({
     {/* Sort */}
     <select
       value={sortBy}
-      onChange={(e) => setSortBy(e.target.value)}
+      onChange={(e) => {
+        setSortBy(e.target.value);
+        setCurrentPage(1);
+      }}
       className="border rounded-lg px-4 py-2"
     >
       <option value="latest">Latest</option>

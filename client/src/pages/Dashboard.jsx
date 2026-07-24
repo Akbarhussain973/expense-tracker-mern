@@ -7,6 +7,7 @@ import OverviewCards from "../components/OverviewCards";
 import CategorySection from "../components/CategorySection";
 import TransactionForm from "../components/TransactionForm";
 import TransactionTable from "../components/TransactionTable";
+import Pagination from "../components/Pagination";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,6 +37,8 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [filterType, setFilterType] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const transactionsPerPage = 5;
   const [stats, setStats] = useState({
     income: 0,
     expense: 0,
@@ -279,6 +282,17 @@ function Dashboard() {
         return 0;
     }
   });
+  const firstIndex = (currentPage - 1) * transactionsPerPage;
+  const lastIndex = firstIndex + transactionsPerPage;
+
+  const currentTransactions = filteredExpenses.slice(
+    firstIndex,
+    lastIndex
+  );
+
+  const totalPages = Math.max(
+    1, Math.ceil(filteredExpenses.length / transactionsPerPage)
+  );
 
   // ---------------------------------------------------------------------
   // Render
@@ -342,10 +356,17 @@ function Dashboard() {
           setSortBy={setSortBy}
           filterType={filterType}
           setFilterType={setFilterType}
-          filteredExpenses={filteredExpenses}
+          filteredExpenses={currentTransactions}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
+          setCurrentPage={setCurrentPage}
         />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          setCurrentPage={setCurrentPage}
+        />
+
       </div>
 
       <ConfirmModal
