@@ -23,6 +23,9 @@ function Dashboard() {
   const [editingId, setEditingId] = useState(null);
   const [categoryName, setCategoryName] = useState("");
   const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);  
+  const [deleteId, setDeleteId] = useState(null);
+  const [deleteType, setDeleteType] = useState("");
   const [stats, setStats] = useState({
     income: 0,
     expense: 0,
@@ -166,42 +169,49 @@ const handleEdit = (exp) => {
     setCategoryName(category.name);
   };
 
-  const handleDelete = async (id) => {
-  if (!window.confirm("Are you sure you want to delete this transaction?")) {
-  return;
-  }
-  try {
-    await fetch(`${API_URL}/transactions/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-       toast.success("Transaction deleted");
-       loadData(); // refresh list after delete
-    }  catch (err) {
-    toast.error("Failed to delete transaction ", + err);
-  }
+ const handleDelete = (id) => {
+  setDeleteId(id);
+  setDeleteType("transaction");
+  setConfirmOpen(true);
 };
 
-const handleDeleteCategory = async (id) => {
-  if (!window.confirm("Delete this category?")) {
-  return;
-  }
+const handleDeleteCategory = (id) => {
+  setDeleteId(id);
+  setDeleteType("category");
+  setConfirmOpen(true);
+};
+
+const confirmDelete = async () => {
   try {
-    const res = await fetch(`${API_URL}/categories/${id}`, {
+    const endpoint =
+      deleteType === "transaction"
+        ? `${API_URL}/transactions/${deleteId}`
+        : `${API_URL}/categories/${deleteId}`;
+
+    const res = await fetch(endpoint, {
       method: "DELETE",
       credentials: "include",
     });
 
     if (!res.ok) {
-      throw new Error("Failed to delete category");
+      throw new Error(`Failed to delete ${deleteType}`);
     }
 
+    toast.success(
+      deleteType === "transaction"
+        ? "Transaction deleted!"
+        : "Category deleted!"
+    );
 
-    if (editingCategoryId === id) {
+    setConfirmOpen(false);
+    setDeleteId(null);
+    setDeleteType("");
+
+    if (deleteType === "category" && editingCategoryId === deleteId) {
       setEditingCategoryId(null);
       setCategoryName("");
     }
-    toast.success("Category deleted");
+
     loadData();
   } catch (err) {
     toast.error(err.message);
@@ -509,6 +519,25 @@ const handleDeleteCategory = async (id) => {
   </div>
 </div>
     </div>
+    <ConfirmModal
+  isOpen={confirmOpen}
+  title={
+    deleteType === "transaction"
+      ? "Delete Transaction?"
+      : "Delete Category?"
+  }
+  message={
+    deleteType === "transaction"
+      ? "This transaction will be permanently deleted."
+      : "This category will be permanently deleted."
+  }
+  onConfirm={confirmDelete}
+  onCancel={() => {
+    setConfirmOpen(false);
+    setDeleteId(null);
+    setDeleteType("");
+  }}
+/>
     </div>
   );
 }
