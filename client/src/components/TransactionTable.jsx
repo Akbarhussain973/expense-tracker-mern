@@ -3,6 +3,10 @@ import { Pencil, Trash2 } from "lucide-react";
 function TransactionTable({
   search,
   setSearch,
+  sortBy,
+  setSortBy,
+  filterType,
+  setFilterType,
   filteredExpenses,
   handleEdit,
   handleDelete,
@@ -11,15 +15,41 @@ function TransactionTable({
     <div className="bg-white rounded-xl shadow-md p-6">
       <h2 className="text-2xl font-semibold text-gray-700 mb-6">Transactions</h2>
 
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search by category or description..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full md:w-96 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+    <div className="flex flex-col md:flex-row gap-4 mb-6">
+
+    {/* Search */}
+    <input
+      type="text"
+      placeholder="Search by category or description..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+
+    {/* Filter */}
+    <select
+      value={filterType}
+      onChange={(e) => setFilterType(e.target.value)}
+      className="border rounded-lg px-4 py-2"
+    >
+      <option value="all">All</option>
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+
+    {/* Sort */}
+    <select
+      value={sortBy}
+      onChange={(e) => setSortBy(e.target.value)}
+      className="border rounded-lg px-4 py-2"
+    >
+      <option value="latest">Latest</option>
+      <option value="oldest">Oldest</option>
+      <option value="highest">Highest Amount</option>
+      <option value="lowest">Lowest Amount</option>
+    </select>
+
+  </div>
 
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">

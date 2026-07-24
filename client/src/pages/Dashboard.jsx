@@ -34,6 +34,8 @@ function Dashboard() {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteType, setDeleteType] = useState("");
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("latest");
+  const [filterType, setFilterType] = useState("all");
   const [stats, setStats] = useState({
     income: 0,
     expense: 0,
@@ -246,13 +248,36 @@ function Dashboard() {
   // ---------------------------------------------------------------------
   // Derived data
   // ---------------------------------------------------------------------
-  const filteredExpenses = expenses.filter((exp) => {
+  const filteredExpenses = expenses
+  .filter((exp) => {
     const query = search.toLowerCase();
 
-    return (
+    const matchesSearch =
       exp.category?.name.toLowerCase().includes(query) ||
-      exp.description?.toLowerCase().includes(query)
-    );
+      exp.description?.toLowerCase().includes(query);
+
+    const matchesType =
+      filterType === "all" || exp.type === filterType;
+
+    return matchesSearch && matchesType;
+  })
+  .sort((a, b) => {
+    switch (sortBy) {
+      case "latest":
+        return new Date(b.date) - new Date(a.date);
+
+      case "oldest":
+        return new Date(a.date) - new Date(b.date);
+
+      case "highest":
+        return b.amount - a.amount;
+
+      case "lowest":
+        return a.amount - b.amount;
+
+      default:
+        return 0;
+    }
   });
 
   // ---------------------------------------------------------------------
@@ -313,6 +338,10 @@ function Dashboard() {
         <TransactionTable
           search={search}
           setSearch={setSearch}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          filterType={filterType}
+          setFilterType={setFilterType}
           filteredExpenses={filteredExpenses}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
