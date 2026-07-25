@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const Transaction = require("../models/Transaction");
 
 exports.getCategories = async (req, res) => {
   const categories = await Category.find({ user: req.userId });
@@ -39,6 +40,16 @@ exports.updateCategory = async (req, res) => {
 };
 
 exports.deleteCategory = async (req, res) => {
+  const transactionsUsingCategory = await Transaction.countDocuments({
+    category: req.params.id,
+  });
+
+  if (transactionsUsingCategory > 0) {
+    return res.status(400).json({
+      message:
+        "This category is being used by existing transactions. Delete or move those transactions first.",
+    });
+  }
   const category = await Category.findOneAndDelete({
     _id: req.params.id,
     user: req.userId,

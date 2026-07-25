@@ -241,8 +241,10 @@ function Dashboard() {
         credentials: "include",
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error(`Failed to delete ${deleteType}`);
+         throw new Error(data.message || `Failed to delete ${deleteType}`);
       }
 
       toast.success(
