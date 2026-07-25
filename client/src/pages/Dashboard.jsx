@@ -8,6 +8,7 @@ import CategorySection from "../components/CategorySection";
 import TransactionForm from "../components/TransactionForm";
 import TransactionTable from "../components/TransactionTable";
 import Pagination from "../components/Pagination";
+import ChartsSection from "../components/ChartsSection";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -325,6 +326,8 @@ function Dashboard() {
         </div>
 
         <OverviewCards stats={stats} />
+
+        <ChartsSection expenses={expenses} />
 
         <CategorySection
           categories={categories}
