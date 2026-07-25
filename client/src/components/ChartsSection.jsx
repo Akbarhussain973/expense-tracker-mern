@@ -64,74 +64,96 @@ function ChartsSection({ expenses }) {
   }, [expenses]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      {/* Pie Chart */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-          Income vs Expense
-        </h2>
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={110}
-                label
-              >
-                {pieData.map((entry, index) => (
-                  <Cell
-                    key={entry.name}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
+    {/* Pie Chart */}
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-colors duration-300">
+      <h2 className="text-2xl font-semibold text-gray-700 dark:text-white mb-6">
+        Income vs Expense
+      </h2>
 
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              outerRadius={110}
+              label
+            >
+              {pieData.map((entry, index) => (
+                <Cell
+                  key={entry.name}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
 
-      {/* Bar Chart */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
-          Monthly Summary
-        </h2>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1f2937",
+                border: "none",
+                borderRadius: "8px",
+                color: "#fff",
+              }}
+            />
 
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-
-              <XAxis dataKey="month" />
-
-              <YAxis />
-
-              <Tooltip />
-
-              <Legend />
-
-              <Bar
-                dataKey="income"
-                fill="#22c55e"
-                radius={[6, 6, 0, 0]}
-              />
-
-              <Bar
-                dataKey="expense"
-                fill="#ef4444"
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
-  );
+
+    {/* Bar Chart */}
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 transition-colors duration-300">
+      <h2 className="text-2xl font-semibold text-gray-700 dark:text-white mb-6">
+        Monthly Summary
+      </h2>
+
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#4b5563" />
+
+            <XAxis
+              dataKey="month"
+              stroke="#9ca3af"
+            />
+
+            <YAxis
+              stroke="#9ca3af"
+            />
+
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1f2937",
+                border: "none",
+                borderRadius: "8px",
+                color: "#fff",
+              }}
+            />
+
+            <Legend />
+
+            <Bar
+              dataKey="income"
+              fill="#22c55e"
+              radius={[6, 6, 0, 0]}
+            />
+
+            <Bar
+              dataKey="expense"
+              fill="#ef4444"
+              radius={[6, 6, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+
+  </div>
+);
 }
 
 export default ChartsSection;

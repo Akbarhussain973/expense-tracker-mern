@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { LogOut, Moon, Sun } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmModal from "../components/ConfirmModal";
 import OverviewCards from "../components/OverviewCards";
@@ -39,13 +39,16 @@ function Dashboard() {
   const [sortBy, setSortBy] = useState("latest");
   const [filterType, setFilterType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const transactionsPerPage = 5;
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
   const [stats, setStats] = useState({
     income: 0,
     expense: 0,
     balance: 0,
   });
 
+  const transactionsPerPage = 5;
   const formRef = useRef(null);
   const categoryFormRef = useRef(null);
   const navigate = useNavigate();
@@ -82,6 +85,16 @@ function Dashboard() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
 
   // ---------------------------------------------------------------------
   // Transaction handlers
@@ -309,20 +322,35 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Expense Tracker</h1>
-            <p className="text-gray-500">Manage your finances</p>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Expense Tracker</h1>
+            <p className="text-gray-500 dark:text-gray-400">Manage your finances</p>
           </div>
+
+          <div className="flex items-center gap-3">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition ${
+              darkMode
+                ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                : "bg-gray-700 hover:bg-gray-800 text-white"
+            }`}
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            {darkMode ? "Light" : "Dark"}
+          </button>
 
           <button
             onClick={handleLogout}
             className="inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
           >
-            <LogOut size={18} /> Logout
+            <LogOut size={18} />
+            Logout
           </button>
+        </div>
         </div>
 
         <OverviewCards stats={stats} />
