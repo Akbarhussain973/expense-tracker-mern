@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Moon, Sun, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmModal from "../components/ConfirmModal";
 import OverviewCards from "../components/OverviewCards";
@@ -9,6 +9,7 @@ import TransactionForm from "../components/TransactionForm";
 import TransactionTable from "../components/TransactionTable";
 import Pagination from "../components/Pagination";
 import ChartsSection from "../components/ChartsSection";
+import { exportTransactionsCSV } from "../utils/exportCSV";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -341,6 +342,14 @@ function Dashboard() {
           >
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             {darkMode ? "Light" : "Dark"}
+          </button>
+
+          <button
+            onClick={() => exportTransactionsCSV(expenses)}
+            className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            <Download size={18} />
+            Export CSV
           </button>
 
           <button
