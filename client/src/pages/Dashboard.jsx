@@ -10,6 +10,7 @@ import TransactionTable from "../components/TransactionTable";
 import Pagination from "../components/Pagination";
 import ChartsSection from "../components/ChartsSection";
 import { exportTransactionsCSV } from "../utils/exportCSV";
+import BudgetCard from "../components/BudgetCard";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -363,6 +364,8 @@ function Dashboard() {
         </div>
 
         <OverviewCards stats={stats} />
+
+        <BudgetCard expense={stats.expense} />
 
         <ChartsSection expenses={expenses} />
 

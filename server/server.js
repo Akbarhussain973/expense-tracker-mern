@@ -10,6 +10,7 @@ const protect = require("./middleware/protect");
 const categoryRoutes = require("./routes/categories");
 const transactionRoutes = require("./routes/transactions");
 const dashboardRoutes = require("./routes/dashboard");
+const budgetRoutes = require("./routes/budgetRoutes");
 const helmet = require("helmet");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -28,6 +29,7 @@ app.use("/", authRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/dashboard", dashboardRoutes);
+app.use("/budget", budgetRoutes);
 
 app.get("/", protect, (req, res) => {
   res.json({ status: "ok" });
