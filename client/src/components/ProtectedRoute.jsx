@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function ProtectedRoute({ children }) {
   const [authStatus, setAuthStatus] = useState("checking"); 
 
   useEffect(() => {
-    fetch("http://localhost:3000/", { credentials: "include" })
+    fetch(`${API_URL}/`, { credentials: "include" })
       .then((res) => {
         setAuthStatus(res.ok ? "authed" : "guest");
       })
