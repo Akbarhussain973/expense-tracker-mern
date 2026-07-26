@@ -65,11 +65,11 @@ function BudgetCard({ income, expense }) {
       </div>
 
       <div className="mt-6 space-y-2 text-gray-700 dark:text-gray-200">
-        <p>Income: £{income.toFixed(2)}</p>
-        <p>Monthly Budget: £{savedBudget.toFixed(2)}</p>
-        <p>Spent: £{expense.toFixed(2)}</p>
-        <p>Budget Remaining: £{remaining.toFixed(2)}</p>
-        <p>Balance: £{balance.toFixed(2)}</p>
+        <p>Income: ${income.toFixed(2)}</p>
+        <p>Monthly Budget: ${savedBudget.toFixed(2)}</p>
+        <p>Spent: ${expense.toFixed(2)}</p>
+        <p>Budget Remaining: ${remaining.toFixed(2)}</p>
+        <p>Balance: ${balance.toFixed(2)}</p>
       </div>
 
       {savedBudget > 0 && (
