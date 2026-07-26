@@ -371,7 +371,10 @@ function Dashboard() {
 
         <OverviewCards stats={stats} />
 
-        <BudgetCard expense={stats.expense} />
+        <BudgetCard
+          income={stats.income}
+          expense={stats.expense}
+        />
 
         <ChartsSection expenses={expenses} />
 
