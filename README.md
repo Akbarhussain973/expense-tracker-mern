@@ -36,11 +36,12 @@ A production-style **Expense Tracker** built with the **MERN Stack** that enable
 
 🚀 **Live Application**
 
-Coming Soon...
+- 🌐 Frontend: <https://expense-tracker-mern-bay.vercel.app/>
+- ⚙️ Backend API: <https://expense-tracker-mern-kh5b.onrender.com/>
 
 > **Note**
 >
-> The application will be deployed on **Render** after project completion.
+> The frontend is deployed on **Vercel** and the backend is hosted on **Render**.
 >
 > Since Render uses a free tier, the first request after inactivity may take **30–60 seconds** while the server wakes up.
 
@@ -221,7 +222,7 @@ The project follows a modular architecture.
 | **Validation** | Joi |
 | **Security** | Helmet, CORS, Express Rate Limit |
 | **Utilities** | Cookie Parser |
-| **Deployment** | Render *(Coming Soon)* |
+| **Deployment** | Vercel (Frontend), Render (Backend) |
 | **Version Control** | Git, GitHub |
 
 ---
@@ -342,17 +343,29 @@ npm install
 PORT=3000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+# Local Development
 CLIENT_URL=http://localhost:5173
+# Production
+CLIENT_URL=https://expense-tracker-mern-bay.vercel.app
 NODE_ENV=development
 ```
 
 ### Frontend (`client/.env`)
 
 ```env
+# Local Development
 VITE_API_URL=http://localhost:3000
 ```
 
-> **Note:** Never commit your `.env` files to GitHub. They contain sensitive credentials.
+For production (Vercel), configure:
+
+```env
+VITE_API_URL=/api
+```
+
+> **Note:** For local development, point `VITE_API_URL` to your local backend (for example `http://localhost:3000`). For production with the Vercel reverse proxy, use `/api`.
+> 
+> Never commit your `.env` files to GitHub. They contain sensitive credentials.
 
 ---
 
@@ -377,6 +390,18 @@ Open your browser and visit:
 ```text
 http://localhost:5173
 ```
+
+---
+
+# 🚀 Deployment
+
+The application is deployed using:
+
+- Frontend: Vercel
+- Backend: Render
+- Database: MongoDB Atlas
+
+The frontend communicates with the backend through a Vercel reverse proxy (`/api`), enabling secure HTTP-only cookie authentication while keeping backend endpoints hidden from the client.
 
 ---
 
@@ -457,7 +482,8 @@ https://github.com/Akbarhussain973
 
 ### Live Demo
 
-Coming Soon...
+- 🌐 Frontend: <https://expense-tracker-mern-bay.vercel.app/>
+- ⚙️ Backend API: <https://expense-tracker-mern-kh5b.onrender.com/>
 
 ---
 
