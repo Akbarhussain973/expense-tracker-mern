@@ -7,7 +7,18 @@ function ProtectedRoute({ children }) {
   const [authStatus, setAuthStatus] = useState("checking"); 
 
   useEffect(() => {
-    fetch(`${API_URL}/`, { credentials: "include" })
+    const token = localStorage.getItem("token");
+
+    const headers = {};
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+      fetch(`${API_URL}/`, {
+        credentials: "include",
+        headers,
+      })
       .then((res) => {
         setAuthStatus(res.ok ? "authed" : "guest");
       })

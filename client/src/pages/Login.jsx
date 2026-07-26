@@ -43,6 +43,8 @@ function Login() {
         return;
       }
 
+      localStorage.setItem("token", data.token);
+
       navigate("/dashboard");
     } catch (err) {
       setError("Server unreachable");

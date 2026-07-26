@@ -106,11 +106,15 @@ function Dashboard() {
   };
 
   const handleLogout = async () => {
-    await fetch(`${API_URL}/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
-    navigate("/login");
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } finally {
+      localStorage.removeItem("token");
+      navigate("/login");
+    }
   };
 
   const handleEdit = (exp) => {
